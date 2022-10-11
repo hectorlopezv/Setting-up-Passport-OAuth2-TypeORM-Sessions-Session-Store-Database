@@ -1,35 +1,18 @@
-import { Controller, Get, Res } from '@nestjs/common';
-import { Response } from 'express';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
+import { AuthService } from 'src/auth/services/auth/auth.service';
+import { GoogleOAuthGuard } from 'src/auth/guards';
 
 @Controller('auth')
 export class AuthController {
-  /**
-   * Get /api/auth/login
-   * this is the route the user will visit to authenticate
-   */
-  @Get('login')
-  login() {
-    return;
-  }
-  /**
-   * Get /api/auth/redirect
-   * this is the redirect URL the OAUTH2 provider will call.
-   */
-  @Get('redirect')
-  redirect(@Res() res: Response) {
-    return res.send(200);
-  }
-  /**
-   * Get /api/auth/status
-   * retrieve the auth status
-   */
-  @Get('status')
-  status() {}
+  constructor(private readonly appService: AuthService) {}
 
-  /**
-   * Get /api/auth/logout
-   * logout the user, destroy the session
-   */
-  @Get('logout')
-  logout() {}
+  @Get()
+  @UseGuards(GoogleOAuthGuard)
+  async googleAuth(@Request() req) {}
+
+  @Get('google-redirect')
+  @UseGuards(GoogleOAuthGuard)
+  googleAuthRedirect(@Request() req) {
+    return this.appService.googleLogin(req);
+  }
 }
