@@ -18,27 +18,27 @@ export class AuthController {
     return req.session;
   }
 
-  @Get('google-redirect')
+  @Get('google/redirect')
   @UseGuards(GoogleOAuthGuard)
   googleAuthRedirect(@Req() req, @Res() res: Response) {
-    console.log('req', req.user);
-    console.log('req', req);
     const { accessToken } = this.jwtAuthService.login(req.user);
-    console.log(accessToken);
+    console.log('accessToken', accessToken);
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       sameSite: 'lax',
     });
-    res.redirect(301, '/');
+
     return req.user;
   }
 
   @Get('logout')
   logout(@Req() req: Request, @Res() res: Response) {
+    console.log('antes de');
     req.session.destroy((err) => {
-      console.log(err);
+      console.log('hello');
+      res.clearCookie('accessToken');
+      res.clearCookie('connect.sid');
+      return 'ok';
     });
-    res.clearCookie('accessToken');
-    res.redirect(301, '/');
   }
 }
