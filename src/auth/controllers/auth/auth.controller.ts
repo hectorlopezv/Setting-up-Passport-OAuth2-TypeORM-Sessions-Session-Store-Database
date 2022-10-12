@@ -10,15 +10,11 @@ export class AuthController {
 
   @Get()
   @UseGuards(GoogleOAuthGuard)
-  async googleAuth(@Req() req) {}
-
-  @UseGuards(LoggedInGuard)
-  @Get('status')
-  status(@Req() req) {
-    return req.session;
+  async googleAuth(@Req() req) {
+    return { msg: 'Google Auth' };
   }
 
-  @Get('google/redirect')
+  @Get('redirect')
   @UseGuards(GoogleOAuthGuard)
   googleAuthRedirect(@Req() req, @Res() res: Response) {
     const { accessToken } = this.jwtAuthService.login(req.user);
@@ -27,10 +23,15 @@ export class AuthController {
       httpOnly: true,
       sameSite: 'lax',
     });
-
+    res.redirect('/');
     return req.user;
   }
 
+  @UseGuards(LoggedInGuard)
+  @Get('status')
+  status(@Req() req) {
+    return req.session;
+  }
   @Get('logout')
   logout(@Req() req: Request, @Res() res: Response) {
     console.log('antes de');
@@ -38,6 +39,7 @@ export class AuthController {
       console.log('hello');
       res.clearCookie('accessToken');
       res.clearCookie('connect.sid');
+      res.redirect('/');
       return 'ok';
     });
   }
